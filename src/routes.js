@@ -24,7 +24,7 @@ router.get('/phones/:id', (request, response) => {
     const {id} = request.params;
     // const id = request.params.id
 
-    if(id > 0 && id < phones.length){
+    if(id >= 0 && id < phones.length){
         response.json(phones[id]);
     } else {
         //204 recuerda que no existe contenido.
@@ -33,24 +33,36 @@ router.get('/phones/:id', (request, response) => {
         
 })
 
+/*
+ * Este método nos permite agregar nuevos telefonos en base a sus atributos.
+ * Primero llamamos los atributos de la clase mediante al request.body
+ * Con ellos, creamos un nuevo phone y lo agregamos al array mediante .push().
+ * Finalmente respondemos con el objeto agregado y el estatus 201 (creado) 
+ */
 router.post('/phones', (request, response) => {
-    // Obtenemos los datos del body
     const {brand, name, capacity, price} = request.body;
-    
-    // Creamos un nuevo Phone
     const phone = new Phone(brand, name, capacity, price);
-
-    // Lo guardamos en la lista de teléfonos
+    
     phones.push(phone);
-
-    // Devolvemos un 201 (Created) y el phone creado
     response.status(201).json(phone);
 })
 
-router.patch('./update/name', (request, response) => {
-    const {name} = request.params;
-
-
+/*
+ * El método PATCH permite actualizar o modificar. 
+ * Este método permite modificar partial o totalmente el elemento seleccionado mediante su índice. 
+ * Se realiza (separan y luego unen) mendiante spread operator para que permita realizar la modificación de los campos (parametros) existentes y,
+ * si se desea, agregar otros.
+ */
+router.patch('/phones/:id', (request, response) => {
+    const {id} = request.params;
+    const phone = phones[id]
+    
+    if(phone){
+        phones[id] = {...phone, ...request.body};
+        response.json(phones[id]);
+    } else {
+        response.status(204).send();
+    }
 })
 
 /**
