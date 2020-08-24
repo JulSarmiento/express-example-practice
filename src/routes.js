@@ -11,10 +11,45 @@ const Phone = require('./models/phone');
 let phones = Phone.showPhones();
 
 /**
- * Este método lista todos los telefonos que estan en array
+ * Este método lista todos los telefonos que estan en array.
+ * un "query param" son parametros opcionales que pueden venir o no en una peticion (url).
+ * Los query params los coloca el usuario, yo solo los proceso.
+ * Para que el usuario lo sepa, debo mandar una documentación. 
  */
 router.get('/phones', (request, response) => {
-    response.json(phones);
+
+    let items = phones;
+    
+    if(request.query){
+        console.log(request.query);
+        const {maxPrice, order} = request.query;
+
+        items = items.filter((phone) => {
+            if(maxPrice){
+                return phone.price <= maxPrice
+            }
+
+            return true
+        });
+
+        if (order) {
+            if(order !== '0' && order !== '1'){
+               return response.status(400).send(`Order ${order} is invalid`);
+
+            }else if(order === '0') {
+                items = items.sort((a, b) => { a.serial - b.serial });
+                console.log('ordenando ascendiente')
+
+            }else if(order === '1'){
+                items = items.sort((a, b) => { b.serial - a.serial });
+                console.log('ordenando descendiente')
+            }
+        }
+
+    } 
+
+    response.json(items);
+
 })
 
 /**
@@ -40,9 +75,9 @@ router.get('/phones/:id', (request, response) => {
  * Finalmente respondemos con el objeto agregado y el estatus 201 (creado) 
  */
 router.post('/phones', (request, response) => {
-    const {brand, name, capacity, price} = request.body;
-    const phone = new Phone(brand, name, capacity, price);
-    
+    const {serial, brand, name, capacity, price} = request.body;
+    const phone = new Phone(serial, brand, name, capacity, price);
+
     phones.push(phone);
     response.status(201).json(phone);
 })
@@ -64,6 +99,24 @@ router.patch('/phones/:id', (request, response) => {
         response.status(204).send();
     }
 })
+
+/*
+ * Este método elimina el elemento seleccionado mediante su posición en el array. 
+ * El estatus 202 representa "aceptado"
+ */
+router.delete('/phones/:id', (request, response) => {
+    const {id} = request.params;
+
+    if(id >= 0 && id < phones.length){
+        phones.splice(id, 1)
+        response.status(202).json(phones);
+        
+    } else {
+        response.status(204).send();
+    }
+})
+
+
 
 /**
  * Aqui se exporta la ruta.
