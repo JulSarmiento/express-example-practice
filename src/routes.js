@@ -15,6 +15,7 @@ let phones = Phone.showPhones();
  * un "query param" son parametros opcionales que pueden venir o no en una peticion (url).
  * Los query params los coloca el usuario, yo solo los proceso.
  * Para que el usuario lo sepa, debo mandar una documentación. 
+ * Incluye filtrado por precio, Orden ascendente y descenten, mediante query params. 
  */
 router.get('/phones', (request, response) => {
 
@@ -22,7 +23,9 @@ router.get('/phones', (request, response) => {
     
     if(request.query){
         const {maxPrice, order} = request.query;
-
+        /**
+         * Esta función validad el query param para filtrar los elementos que cumplan el parametro.
+         */
         items = items.filter((phone) => {
             if(maxPrice){
                 return phone.price <= maxPrice
@@ -32,6 +35,10 @@ router.get('/phones', (request, response) => {
         });
 
         if (order) {
+            /**
+             * Esta función validad el query param para ordenar de forma ascendente o descendente, de lo contrario,
+             * alerta con eror 404.
+             */
             if(order !== '0' && order !== '1'){
                return response.status(400).send(`Order ${order} is invalid`);
 

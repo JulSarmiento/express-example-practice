@@ -1,7 +1,7 @@
 class Phone{
     /**
      * Esta es la clase de telefonos
-     * 
+     * @param {number} serial
      * @param {string} brand 
      * @param {string} name 
      * @param {string} capacity 
