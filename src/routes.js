@@ -21,7 +21,6 @@ router.get('/phones', (request, response) => {
     let items = phones;
     
     if(request.query){
-        console.log(request.query);
         const {maxPrice, order} = request.query;
 
         items = items.filter((phone) => {
@@ -37,12 +36,15 @@ router.get('/phones', (request, response) => {
                return response.status(400).send(`Order ${order} is invalid`);
 
             }else if(order === '0') {
-                items = items.sort((a, b) => { a.serial - b.serial });
-                console.log('ordenando ascendiente')
+                items.sort((a, b) => {
+                    return a.serial - b.serial });
+                console.log('ascendent order');
 
             }else if(order === '1'){
-                items = items.sort((a, b) => { b.serial - a.serial });
-                console.log('ordenando descendiente')
+                items.sort((a, b) => { 
+                    return b.serial - a.serial 
+                });
+                console.log('descendent order');
             }
         }
 
